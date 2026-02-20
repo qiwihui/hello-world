@@ -3,23 +3,151 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World</title>
+    <title>OpenClaw 技术入门：架构、优势与安装实践</title>
     <style>
-      :root { color-scheme: light dark; }
+      :root {
+        color-scheme: light dark;
+      }
       body {
         margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans CJK SC", sans-serif;
+        line-height: 1.75;
+      }
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
       }
       h1 {
-        font-size: clamp(2rem, 6vw, 4rem);
-        margin: 0;
+        line-height: 1.3;
+        margin-bottom: 10px;
+      }
+      h2 {
+        margin-top: 34px;
+      }
+      pre {
+        padding: 14px;
+        border-radius: 10px;
+        overflow-x: auto;
+        background: rgba(127, 127, 127, 0.12);
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      }
+      .muted {
+        opacity: 0.75;
+      }
+      ul {
+        padding-left: 22px;
+      }
+      .footer {
+        margin-top: 44px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(127, 127, 127, 0.25);
       }
     </style>
   </head>
   <body>
-    <h1>Hello, world! 👋</h1>
+    <main class="container">
+      <h1>OpenClaw 技术入门：架构、优势与安装实践</h1>
+      <p class="muted">更新于 2026-02-21</p>
+
+      <p>
+        如果你想构建一个“可在 Telegram / WhatsApp / Discord 等渠道统一接入”的 AI 助手系统，而不是单点 bot，<strong>OpenClaw</strong>
+        是一套值得关注的开源方案。
+      </p>
+
+      <h2>1. OpenClaw 是什么（技术视角）</h2>
+      <p><strong>OpenClaw = 多渠道消息网关 + Agent 运行入口 + 会话路由层。</strong></p>
+      <p>
+        它的核心不是“再造一个聊天机器人”，而是把多平台消息输入统一抽象为可编排事件流，再将其路由到 AI Agent 执行。
+      </p>
+      <p>典型数据流可以简化为：</p>
+      <pre><code>[Channels: Telegram/WhatsApp/Discord/...]
+            ↓
+        [OpenClaw Gateway]
+   (auth, routing, sessions, policy)
+            ↓
+       [Agent Runtime + Tools]
+            ↓
+        [Reply to Channels]</code></pre>
+
+      <h2>2. 为什么它有工程价值</h2>
+      <h3>2.1 单网关多渠道，降低系统碎片化</h3>
+      <p>传统做法是每个平台单独写一套 bot。OpenClaw 的优势是：<strong>一个 Gateway 承接多个渠道</strong>，共用会话、策略和工具体系。</p>
+
+      <h3>2.2 自托管可控，适配企业/个人安全边界</h3>
+      <p>你可以把 Gateway 跑在本机、家用服务器或云主机上，减少对第三方托管平台的依赖，数据边界更清晰。</p>
+
+      <h3>2.3 面向 Agent 的“执行层”能力</h3>
+      <p>它支持 Agent 工具调用、会话隔离、多代理路由，不只是纯消息转发。对“AI 助手自动化”场景更友好（比如代码、运维、信息聚合）。</p>
+
+      <h3>2.4 可扩展生态</h3>
+      <p>开源（MIT）+ 插件化渠道，适合持续演进。对团队来说，意味着可把它当作“消息入口基础设施”长期维护。</p>
+
+      <h2>3. 安装方式对比（工程实践）</h2>
+      <p>官方要求：</p>
+      <ul>
+        <li>Node.js 22+</li>
+        <li>macOS / Linux / Windows（Windows 推荐 WSL2）</li>
+      </ul>
+
+      <h3>方式 A：安装脚本（推荐，最快）</h3>
+      <p>macOS / Linux / WSL2：</p>
+      <pre><code>curl -fsSL https://openclaw.ai/install.sh | bash</code></pre>
+      <p>Windows PowerShell：</p>
+      <pre><code>iwr -useb https://openclaw.ai/install.ps1 | iex</code></pre>
+      <p>然后执行引导：</p>
+      <pre><code>openclaw onboard --install-daemon</code></pre>
+
+      <h3>方式 B：npm / pnpm（适合有现成 Node 环境）</h3>
+      <pre><code>npm install -g openclaw@latest
+openclaw onboard --install-daemon</code></pre>
+      <p>或：</p>
+      <pre><code>pnpm add -g openclaw@latest
+pnpm approve-builds -g
+openclaw onboard --install-daemon</code></pre>
+
+      <h3>方式 C：源码部署（适合二开/贡献）</h3>
+      <pre><code>git clone https://github.com/openclaw/openclaw.git
+cd openclaw
+pnpm install
+pnpm ui:build
+pnpm build
+pnpm link --global
+openclaw onboard --install-daemon</code></pre>
+
+      <h2>4. 上线前的最小验证流程（建议）</h2>
+      <pre><code>openclaw gateway status   # 看服务状态
+openclaw doctor           # 诊断配置问题
+openclaw dashboard        # 打开控制台</code></pre>
+      <p>如果控制台可用，说明 Gateway 主流程已通。然后再逐个接入渠道，避免一次性并发排障。</p>
+
+      <h2>5. 架构落地建议（避免新手坑）</h2>
+      <ul>
+        <li><strong>先通本地控制台，再接消息渠道</strong>：先验证 Agent 与工具链，再接 Telegram/WhatsApp，定位更快。</li>
+        <li><strong>会话路由策略先做最小可用</strong>：建议先按发送者隔离会话，后续再做多代理。</li>
+        <li><strong>先做基础安全策略</strong>：allowlist、群聊 requireMention、token 与配置文件权限。</li>
+        <li><strong>运行环境建议</strong>：开发机前台跑，生产机 daemon/service + 固定状态目录 + 定时备份。</li>
+      </ul>
+
+      <h2>6. 适合哪些团队/个人</h2>
+      <ul>
+        <li>希望把 AI 助手嵌入日常 IM 通信流</li>
+        <li>需要跨平台统一入口的自动化团队</li>
+        <li>对“自托管、可审计、可扩展”有硬需求的开发者</li>
+      </ul>
+      <p>不太适合：只想做一次性单平台 bot 且无需长期维护的场景。</p>
+
+      <h2>7. 结语</h2>
+      <p>
+        从技术选型角度看，OpenClaw 更像 <strong>AI 通信网关基础设施</strong>，而不是一个临时 bot 工具。
+        如果你的目标是“长期可维护 + 多渠道统一 + Agent 原生能力”，它是值得投入的架构方向。
+      </p>
+
+      <div class="footer muted">
+        发布地址：<a href="https://qiwihui.github.io/hello-world/">https://qiwihui.github.io/hello-world/</a>
+      </div>
+    </main>
   </body>
 </html>
